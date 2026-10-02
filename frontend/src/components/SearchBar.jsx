@@ -1,0 +1,9 @@
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {MapPin, Search, Shapes, ChevronDown} from 'lucide-react';
+import {Action} from './Common';
+export const SearchBar = ({initialLocation='', initialCategory='', compact=false}) => {
+  const [location, setLocation] = useState(initialLocation), [category,setCategory]=useState(initialCategory); const navigate=useNavigate();
+  const submit=e=>{e.preventDefault(); const params=new URLSearchParams(); if(location.trim())params.set('location',location.trim()); if(category)params.set('category',category); navigate('/properties?'+params.toString());};
+  return <form className={`search-bar ${compact?'compact':''}`} onSubmit={submit} data-testid="property-search-form"><label className="search-location"><MapPin size={21}/><span><span className="search-label" data-testid="search-location-label">Where do you want to go?</span><input data-testid="search-location" aria-label="Search location" placeholder="City, region, or country" value={location} onChange={e=>setLocation(e.target.value)} maxLength={120}/></span></label><span className="search-divider"/><label className="search-category"><Shapes size={21}/><span><span className="search-label" data-testid="search-category-label">What are you looking for?</span><select aria-label="Property category" data-testid="search-category" value={category} onChange={e=>setCategory(e.target.value)}><option value="">All property types</option>{['Rent','Vacation','Outings','Land'].map(c=><option key={c}>{c}</option>)}</select></span><ChevronDown size={16}/></label><Action type="submit" className="search-submit" data-testid="search-submit"><Search size={18}/>Search places</Action></form>;
+};

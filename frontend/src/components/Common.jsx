@@ -1,0 +1,20 @@
+import {Loader2, ArrowLeft, MapPin, Heart, BedDouble, Users, LandPlot, ArrowUpRight} from 'lucide-react';
+import {Link, useNavigate} from 'react-router-dom';
+import {useState} from 'react';
+import {Button} from './ui/button';
+import {useApp} from '../context';
+import {money, imageUrl, unit} from '../lib/api';
+export const Action = ({children, busy, className='', ...props}) => <Button className={`action ${className}`} {...props} disabled={props.disabled || busy}>{busy ? <Loader2 className="spin"/> : null}{children}</Button>;
+export const Loading = () => <div className="loading" data-testid="page-loading"><Loader2 className="spin"/><span>Finding your next place…</span></div>;
+export const ErrorState = ({message, retry}) => <div className="empty-state" role="alert" data-testid="error-state"><h2 data-testid="error-heading">Something went wrong</h2><p data-testid="error-message">{message}</p>{retry && <Action onClick={retry} data-testid="retry-button">Try again</Action>}</div>;
+export const Empty = ({title='No places found', text='Try a different location or adjust your filters.', children}) => <div className="empty-state" data-testid="empty-state"><MapPin size={32}/><h2 data-testid="empty-title">{title}</h2><p data-testid="empty-description">{text}</p>{children}</div>;
+export const Back = ({to='/properties', label='Back to all places'}) => <Link data-testid="back-link" className="back-link" to={to}><ArrowLeft size={16}/>{label}</Link>;
+export const Field = ({label, id, children, ...props}) => <label className="field" htmlFor={id} data-testid={`${id}-label`}><span>{label}</span>{children || <input id={id} data-testid={id} {...props}/>}</label>;
+export const Favorite = ({property, prefix='card'}) => {
+  const {favorites, toggleFavorite, user} = useApp(), navigate = useNavigate(); const [busy, setBusy] = useState(false); const saved = favorites.some(p => p.id === property.id);
+  return <button type="button" className={`favorite ${saved ? 'saved' : ''}`} disabled={busy} aria-label={saved ? 'Remove from saved' : 'Save property'} aria-pressed={saved} title={saved ? 'Remove from saved' : 'Save property'} data-testid={`${prefix}-favorite-${property.id}`} onClick={async e => {e.preventDefault(); e.stopPropagation(); if(!user) {navigate('/signin', {state:{from:'/saved'}}); return;} setBusy(true); await toggleFavorite(property.id); setBusy(false);}}><Heart size={18} fill={saved ? 'currentColor' : 'none'}/></button>;
+};
+export const PropertyCard = ({property:p}) => <article className="property-card" data-testid={`property-card-${p.id}`}>
+  <div className="card-photo"><Link to={`/properties/${p.id}`} data-testid={`property-image-link-${p.id}`} tabIndex={-1} aria-label={p.title}><img src={imageUrl(p.images[0])} alt={p.title} loading="lazy"/></Link><div className="card-badges"><span className={`badge ${p.listing_plan !== 'Free' ? 'gold' : ''}`} data-testid={`property-badge-${p.id}`}>{p.listing_plan !== 'Free' ? <><span>✦</span> {p.listing_plan}</> : p.category}</span>{p.is_sample && <span className="badge sample" data-testid={`sample-badge-${p.id}`}>Sample listing</span>}</div><Favorite property={p}/><span className="photo-category" data-testid={`property-category-${p.id}`}>{p.category}</span></div>
+  <div className="card-body"><p className="card-location" data-testid={`property-location-${p.id}`}><MapPin size={13}/>{p.location}, {p.country}</p><Link to={`/properties/${p.id}`} className="card-title" data-testid={`property-title-${p.id}`}>{p.title}<ArrowUpRight size={17}/></Link><div className="card-details" data-testid={`property-features-${p.id}`}>{p.category === 'Land' ? <span><LandPlot size={14}/>{p.size}</span> : <>{p.category !== 'Outings' && <span><BedDouble size={14}/>{p.bedrooms} beds</span>}<span><Users size={14}/>{p.guests} guests</span></>}</div><div className="card-price" data-testid={`property-price-${p.id}`}><strong>{money(p.price)}</strong><span>{unit(p.category)}</span></div></div>
+</article>;

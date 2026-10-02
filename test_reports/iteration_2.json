@@ -1,0 +1,46 @@
+{
+  "summary": "Completed critical-fix retest for auth origin handling, backend regression, and end-to-end owner/customer browser flows on public preview URL. Origin-based auth now works in real browser context, protected owner UI is accessible, and mobile toaster overflow fix is validated.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Google external auth provider completion",
+        "issue": "Redirect URL is correct, but full third-party completion remains externally dependent; auth.emergentagent.com showed external 404/CORS console noise during provider page load.",
+        "affected_selectors": [
+          "[data-testid='google-signin']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_marketplace_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Optionally validate Google provider flow in an environment where external auth provider dependencies are fully available.",
+    "Keep monitoring auth-origin middleware with ingress changes; current regression passed."
+  ],
+  "critical_code_review_comments": [
+    "Origin validation middleware fix appears correct and strict (no wildcard) while supporting forwarded host/routed host paths.",
+    "Protected route and ownership controls remained enforced during browser retest (non-owner edit denied, signed-out dashboard redirect)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_marketplace_api.py",
+    "/app/test_reports/iteration_2.json"
+  ],
+  "success_rate": {
+    "backend": "100% (15/15)",
+    "frontend": "96% (core requested flows passed; external Google completion remains environment-dependent)"
+  },
+  "test_credentials": "Missing reusable credentials in /app/memory/test_credentials.md (template-only). Temporary users were created via UI and used for this run.",
+  "seed_data_creation": "Created temporary owner/customer UI accounts and temporary listings for end-to-end verification; cleaned up temporary owner listings at end.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Critical origin-auth fix is validated in browser. Mobile overflow check at 390x844 returned hasOverflow=false on dashboard/listing/detail/contact-modal screens. Temporary properties were deleted after test run.",
+  "rca of the issue": "Previous blocker (browser auth 403 on Origin) is resolved. Added explicit Origin-header regression test in backend suite and confirmed pass. Remaining Google console errors occurred on external auth host page, not on app-origin auth endpoints."
+}

@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+ :root {--background:150 9% 7%;--foreground:45 12% 94%;--card:150 8% 10%;--card-foreground:45 12% 94%;--popover:150 8% 11%;--popover-foreground:45 12% 94%;--primary:157 54% 53%;--primary-foreground:155 43% 9%;--secondary:150 7% 16%;--secondary-foreground:45 12% 94%;--muted:150 7% 17%;--muted-foreground:140 5% 65%;--accent:150 7% 18%;--accent-foreground:45 12% 94%;--destructive:0 65% 52%;--destructive-foreground:0 0% 100%;--border:145 7% 20%;--input:145 7% 24%;--ring:157 54% 53%;--radius:.5rem;}
+ *{@apply border-border;box-sizing:border-box;}
+ body{@apply bg-background text-foreground;margin:0;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+}
