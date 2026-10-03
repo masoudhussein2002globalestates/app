@@ -2,7 +2,8 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict, field_validator
 from datetime import date
 
-Category = Literal['Rent', 'Vacation', 'Outings', 'Land']
+Category = Literal['Rent', 'Vacation', 'Outings', 'Land', 'Buy Property']
+Status = Literal['draft', 'published', 'pending', 'suspended', 'deleted']
 
 class UserOut(BaseModel):
     user_id: str
@@ -11,20 +12,24 @@ class UserOut(BaseModel):
     picture: str = ''
 
 class PropertyInput(BaseModel):
-    model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')
+    model_config = ConfigDict(str_strip_whitespace=True, extra='ignore')
     title: str = Field(min_length=5, max_length=120)
     category: Category
+    property_type: str = Field(default='House', min_length=2, max_length=80)
+    city: str = Field(default='', min_length=2, max_length=120)
     location: str = Field(min_length=2, max_length=120)
     country: str = Field(min_length=2, max_length=80)
     description: str = Field(min_length=30, max_length=8000)
     price: float = Field(gt=0, le=100000000000)
     bedrooms: int = Field(default=0, ge=0, le=100)
+    bathrooms: int = Field(default=0, ge=0, le=100)
     guests: int = Field(default=1, ge=1, le=500)
+    size: str = Field(default='', max_length=150)
     amenities: list[str] = Field(default_factory=list, max_length=30)
     images: list[str] = Field(min_length=1, max_length=12)
     contact_email: EmailStr
-    size: str = Field(default='', max_length=80)
-    status: Literal['active', 'paused'] = 'active'
+    status: Status = 'published'
+    listing_plan: str = 'Free'
 
     @field_validator('images')
     @classmethod
@@ -48,11 +53,14 @@ class PropertyOut(BaseModel):
     host_name: str
     title: str
     category: Category
+    property_type: str = 'House'
+    city: str = ''
     location: str
     country: str
     description: str
     price: float
     bedrooms: int
+    bathrooms: int = 0
     guests: int
     amenities: list[str]
     images: list[str]
@@ -61,6 +69,7 @@ class PropertyOut(BaseModel):
     status: str
     is_sample: bool = False
     created_at: str
+    plan_rank: int = 0
 
 class PropertyList(BaseModel):
     properties: list[PropertyOut]
@@ -76,7 +85,7 @@ class BookingInput(BaseModel):
 
 class CheckoutInput(BaseModel):
     property_id: str
-    plan: Optional[Literal['Featured', 'Premium']] = None
+    plan: Optional[Literal['Featured', 'Premium', 'Top Placement']] = None
     check_in: Optional[date] = None
     check_out: Optional[date] = None
     guests: int = Field(default=1, ge=1, le=500)
